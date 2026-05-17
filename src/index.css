@@ -1,49 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
 @import "tailwindcss";
+CSS
+.dancing-script-regular {
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.dancing-script-medium {
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.dancing-script-semibold {
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.dancing-script-bold {
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
 @theme inline {
-	--color-extwuwa-accent: var(--wuwa-accent);
-	--color-extzzz-accent: var(--zzz-accent);
-	--color-extzzz-accent-2: var(--zzz-accent-2);
-	--color-extgi-accent: var(--gi-accent);
-	--color-extsr-accent: var(--sr-accent);
-	--color-extef-accent: var(--ef-accent);
-	--color-extbutton: var(--extbutton);
-	--color-extbackground: var(--extbackground);
-	--color-extforeground: var(--extforeground);
-	--color-extcard: var(--extcard);
-	--color-extcard-foreground: var(--extcard-foreground);
-	--color-extpopover: var(--extpopover);
-	--color-extpopover-foreground: var(--extpopover-foreground);
-	--color-extprimary: var(--extprimary);
-	--color-extprimary-foreground: var(--extprimary-foreground);
-	--color-extsecondary: var(--extsecondary);
-	--color-extsecondary-foreground: var(--extsecondary-foreground);
-	--color-extmuted: var(--extmuted);
-	--color-extmuted-foreground: var(--extmuted-foreground);
-	--color-extaccent: var(--extaccent);
-	--color-extaccent-foreground: var(--extaccent-foreground);
-	--color-extdestructive: var(--extdestructive);
-	--color-extwarn: var(--extwarn);
-	--color-extsuccess: var(--extsuccess);
-	--color-extlink: var(--extlink);
-	--color-extborder: var(--extborder);
-	--color-extinput: var(--extinput);
-	--color-extring: var(--extring);
-	--color-extchart-1: var(--extchart-1);
-	--color-extchart-2: var(--extchart-2);
-	--color-extchart-3: var(--extchart-3);
-	--color-extchart-4: var(--extchart-4);
-	--color-extchart-5: var(--extchart-5);
-	--color-extsidebar: var(--extsidebar);
-	--color-extsidebar-foreground: var(--extsidebar-foreground);
-	--color-extsidebar-primary: var(--extsidebar-primary);
-	--color-extsidebar-primary-foreground: var(--extsidebar-primary-foreground);
-	--color-extsidebar-accent: var(--extsidebar-accent);
-	--color-extsidebar-accent-foreground: var(--extsidebar-accent-foreground);
-	--color-extsidebar-border: var(--extsidebar-border);
-	--color-extsidebar-ring: var(--extsidebar-ring);
+	--color-wuwa-accent: var(--wuwa-accent);
+	--color-zzz-accent: var(--zzz-accent);
+	--color-zzz-accent-2: var(--zzz-accent-2);
+	--color-gi-accent: var(--gi-accent);
+	--color-sr-accent: var(--sr-accent);
+	--color-ef-accent: var(--ef-accent);
+	--color-button: var(--button);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-warn: var(--warn);
+	--color-success: var(--success);
+	--color-link: var(--link);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
 }
 :root {
-	--wuwa-accent: #cdb896;
+	--wuwa-accent: #cac1ec;
 	--zzz-accent: #efdd00;
 	--zzz-accent-2: #f68f36;
 	--gi-accent: #d1bc8e;
@@ -60,7 +89,7 @@
 	--primary-foreground: oklch(0.216 0.006 56.043);
 	--secondary: oklch(0.268 0.007 34.298);
 	--secondary-foreground: oklch(0.985 0.001 106.423);
-	--muted: #837660;
+	--muted: #8b85a1;
 	--muted-foreground: oklch(0.709 0.01 56.259);
 	--accent-foreground: oklch(0.985 0.001 106.423);
 	--destructive: oklch(80.8% 0.114 19.571);
@@ -84,10 +113,10 @@
 	--radius-main: 0.5rem;
 	--border-w-main: 1px;
 	--button: #2d2a28;
-	--background: #0c0a09;
-	--card: oklch(21.612% 0.00611 55.916);
+	--background: #0c0b0f;
+	--card: #211f24;
 	--accent: var(--wuwa-accent);
-	--border: #4e463a;
+	--border: #3a3a4e;
 	--input: oklch(100% 0.00011 271.152 / 0.15);
 	--sidebar: oklch(0.216 0.006 56.043);
 }

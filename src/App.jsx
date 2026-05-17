@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { styles } from "./css";
 
 const songs = [
 	{
@@ -939,178 +940,7 @@ const processing = {
 	playlist: false,
 	save: false,
 };
-const theme = {
-	accent: "#cdb896",
-	accent50: "rgba(205, 184, 150, 0.5)",
-	background: "#0c0a09",
-	border: "#4e463a",
-	card: "oklch(21.612% 0.00611 55.916)",
-	muted: "#837660",
-	muted10: "rgba(131, 118, 96, 0.1)",
-	muted20: "rgba(131, 118, 96, 0.2)",
-	muted30: "rgba(131, 118, 96, 0.3)",
-	primary: "oklch(0.923 0.003 48.717)",
-};
-const styles = {
-	stepsContainer: {
-		display: "flex",
-		flexDirection: "column",
-		fontSize: "0.875rem",
-		fontWeight: 600,
-		color: theme.accent50,
-		alignSelf: "center",
-		width: "66.6667%",
-		height: "2.5rem",
-	},
-	stepsRow: {
-		display: "flex",
-		alignItems: "center",
-		gap: "0.25rem",
-		width: "100%",
-		height: "100%",
-	},
-	progressFill: {
-		backgroundColor: theme.accent,
-		height: "0.5rem",
-		borderTopLeftRadius: "0.125rem",
-		borderBottomLeftRadius: "0.125rem",
-		borderTopRightRadius: "0.0625rem",
-		borderBottomRightRadius: "0.0625rem",
-		transition: "min-width 200ms",
-	},
-	progressTick: {
-		minWidth: "0.25rem",
-		minHeight: "1rem",
-		backgroundColor: theme.accent,
-		borderRadius: "0.125rem",
-	},
-	progressRemaining: {
-		width: "100%",
-		height: "0.5rem",
-		backgroundColor: theme.muted10,
-		borderTopLeftRadius: "0.0625rem",
-		borderBottomLeftRadius: "0.0625rem",
-		borderTopRightRadius: "0.125rem",
-		borderBottomRightRadius: "0.125rem",
-	},
-	stepsLabelsRow: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "space-between",
-		gap: "0.25rem",
-		marginTop: "-1.1875rem",
-		width: "100%",
-		height: "100%",
-	},
-	stepLabelLeft: {
-		transform: "translateX(-100%)",
-		marginLeft: "-0.375rem",
-		transition: "color 200ms",
-	},
-	stepLabelRight: {
-		transform: "translateX(100%)",
-		marginRight: "-1rem",
-		transition: "color 200ms",
-	},
-	stepsDividerRow: {
-		display: "flex",
-		alignItems: "center",
-		gap: "0.5rem",
-		width: "100%",
-		justifyContent: "space-evenly",
-	},
-	stepColumn: {
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-		transition: "color 200ms",
-	},
-	playlistDividerRow: {
-		display: "flex",
-		alignItems: "center",
-		gap: "0.5rem",
-		width: "100%",
-	},
-	playlistSpacerLeft: {
-		width: "28.5714%",
-	},
-	playlistSpacerRight: {
-		width: "42.8571%",
-	},
-	playlistStepColumnLeft: {
-		display: "flex",
-		flexDirection: "column",
-		width: 0,
-		alignItems: "center",
-		justifyContent: "center",
-		marginLeft: "-0.1875rem",
-		transition: "color 200ms",
-	},
-	playlistStepColumnRight: {
-		display: "flex",
-		flexDirection: "column",
-		width: 0,
-		alignItems: "center",
-		justifyContent: "center",
-		marginLeft: "-0.9375rem",
-		transition: "color 200ms",
-	},
-	nowrap: {
-		whiteSpace: "nowrap",
-	},
-	card: {
-		position: "fixed",
-		borderBottom: `1px solid ${theme.border}`,
-		borderLeft: `1px solid ${theme.border}`,
-		borderBottomLeftRadius: "0.5rem",
-		top: 0,
-		right: 0,
-		width: "41rem",
-		height: "16rem",
-		backgroundColor: theme.background,
-		display: "flex",
-	},
-	cardSidebar: {
-		width: "25%",
-		height: "100%",
-		borderRight: `1px solid ${theme.border}`,
-		display: "flex",
-		flexDirection: "column",
-	},
-	cardSidebarContent: {
-		padding: "1rem",
-		color: theme.primary,
-		display: "flex",
-		flexDirection: "column",
-	},
-	cardControls: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "space-evenly",
-		width: "100%",
-	},
-	controlButton: {
-		borderRadius: "9999px",
-		width: "2rem",
-		height: "2rem",
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center",
-		fontSize: "1.125rem",
-		border: "none",
-		color: "inherit",
-		cursor: "pointer",
-	},
-	cardBody: {
-		width: "75%",
-		height: "100%",
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-};
+
 // const playlist = getPlaylist();
 let playlist_name = Date.now().toString();
 // await createYTPlaylist(playlist_name);
@@ -1280,186 +1110,195 @@ function App() {
 		await waitTillLoading("ytmusic-editable-playlist-detail-header-renderer");
 		setPlaylistSteps(4);
 	}
-	useEffect(() => {
-		if (globalSteps === 1) {
-			setTimeout(() => setGlobalSteps(2), 500);
-			return;
-		}
-		if (globalSteps === 2) {
-			setPlaylistSteps(1);
-		}
-		if (globalSteps === 3) {
-		}
-	}, [globalSteps]);
-	useEffect(() => {
-		if (playlistSteps === 1) {
-			setTimeout(() => createYTPlaylist(playlist_name), 500);
-			return;
-		}
-		if (playlistSteps === 4) {
-			setTimeout(() => setGlobalSteps(3), 500);
-			return;
-		}
-	}, [playlistSteps]);
+	// useEffect(() => {
+	// 	if (globalSteps === 1) {
+	// 		setTimeout(() => setGlobalSteps(2), 500);
+	// 		return;
+	// 	}
+	// 	if (globalSteps === 2) {
+	// 		setPlaylistSteps(1);
+	// 	}
+	// 	if (globalSteps === 3) {
+	// 	}
+	// }, [globalSteps]);
+	// useEffect(() => {
+	// 	if (playlistSteps === 1) {
+	// 		setTimeout(() => createYTPlaylist(playlist_name), 500);
+	// 		return;
+	// 	}
+	// 	if (playlistSteps === 4) {
+	// 		setTimeout(() => setGlobalSteps(3), 500);
+	// 		return;
+	// 	}
+	// }, [playlistSteps]);
 
-	const glboalStepsDisplay = (
-		<div style={{ ...styles.stepsContainer, marginBottom: "2.5rem" }}>
-			<div style={styles.stepsRow}>
-				<div
-					style={{
-						...styles.progressFill,
-						minWidth: `calc(${globalSteps > 3 ? 7 : globalSteps > 2 ? 5 : globalSteps > 1 ? 2 : 0} / 7 * 100%)`,
-					}}
-				/>
-				<div style={styles.progressTick} />
-				<div style={styles.progressRemaining} />{" "}
-			</div>
-			<div style={styles.stepsLabelsRow}>
-				<span
-					style={{
-						...styles.stepLabelLeft,
-						color: globalSteps >= 1 ? theme.accent : undefined,
-					}}>
-					Begin
-				</span>
+	// const glboalStepsDisplay = (
+	// 	<div style={{ ...styles.stepsContainer, marginBottom: "2.5rem" }}>
+	// 		<div style={styles.stepsRow}>
+	// 			<div
+	// 				style={{
+	// 					...styles.progressFill,
+	// 					minWidth: `calc(${globalSteps > 3 ? 7 : globalSteps > 2 ? 5 : globalSteps > 1 ? 2 : 0} / 7 * 100%)`,
+	// 				}}
+	// 			/>
+	// 			<div style={styles.progressTick} />
+	// 			<div style={styles.progressRemaining} />{" "}
+	// 		</div>
+	// 		<div style={styles.stepsLabelsRow}>
+	// 			<span
+	// 				style={{
+	// 					...styles.stepLabelLeft,
+	// 					color: globalSteps >= 1 ? theme.accent : undefined,
+	// 				}}>
+	// 				Begin
+	// 			</span>
 
-				<span
-					style={{
-						...styles.stepLabelRight,
-						color: globalSteps >= 4 ? theme.accent : undefined,
-					}}>
-					Done
-				</span>
-			</div>
-			<div style={styles.stepsDividerRow}>
-				<div
-					style={{
-						...styles.stepColumn,
-						color: globalSteps >= 2 ? theme.accent : undefined,
-					}}>
-					<div>|</div>
-					Create Playlist
-				</div>
-				<div
-					style={{
-						...styles.stepColumn,
-						color: globalSteps >= 3 ? theme.accent : undefined,
-					}}>
-					<div>|</div>
-					Add Songs
-				</div>
-			</div>
-		</div>
-	);
-	const playlistStepsDisplay = (
-		<div style={styles.stepsContainer}>
-			<div style={styles.stepsRow}>
-				<div
-					style={{
-						...styles.progressFill,
-						minWidth: `calc(${playlistSteps > 3 ? 7 : playlistSteps > 2 ? 5 : playlistSteps > 1 ? 2 : 0} / 7 * 100%)`,
-					}}
-				/>
-				<div style={styles.progressTick} />
-				<div style={styles.progressRemaining} />{" "}
-			</div>
-			<div style={styles.stepsLabelsRow}>
-				<span
-					style={{
-						...styles.stepLabelLeft,
-						color: playlistSteps >= 1 ? theme.accent : undefined,
-					}}>
-					Begin
-				</span>
+	// 			<span
+	// 				style={{
+	// 					...styles.stepLabelRight,
+	// 					color: globalSteps >= 4 ? theme.accent : undefined,
+	// 				}}>
+	// 				Done
+	// 			</span>
+	// 		</div>
+	// 		<div style={styles.stepsDividerRow}>
+	// 			<div
+	// 				style={{
+	// 					...styles.stepColumn,
+	// 					color: globalSteps >= 2 ? theme.accent : undefined,
+	// 				}}>
+	// 				<div>|</div>
+	// 				Create Playlist
+	// 			</div>
+	// 			<div
+	// 				style={{
+	// 					...styles.stepColumn,
+	// 					color: globalSteps >= 3 ? theme.accent : undefined,
+	// 				}}>
+	// 				<div>|</div>
+	// 				Add Songs
+	// 			</div>
+	// 		</div>
+	// 	</div>
+	// );
+	// const playlistStepsDisplay = (
+	// 	<div style={styles.stepsContainer}>
+	// 		<div style={styles.stepsRow}>
+	// 			<div
+	// 				style={{
+	// 					...styles.progressFill,
+	// 					minWidth: `calc(${playlistSteps > 3 ? 7 : playlistSteps > 2 ? 5 : playlistSteps > 1 ? 2 : 0} / 7 * 100%)`,
+	// 				}}
+	// 			/>
+	// 			<div style={styles.progressTick} />
+	// 			<div style={styles.progressRemaining} />{" "}
+	// 		</div>
+	// 		<div style={styles.stepsLabelsRow}>
+	// 			<span
+	// 				style={{
+	// 					...styles.stepLabelLeft,
+	// 					color: playlistSteps >= 1 ? theme.accent : undefined,
+	// 				}}>
+	// 				Begin
+	// 			</span>
 
-				<span
-					style={{
-						...styles.stepLabelRight,
-						color: playlistSteps >= 4 ? theme.accent : undefined,
-					}}>
-					Done
-				</span>
-			</div>
-			<div style={styles.playlistDividerRow}>
-				<div style={styles.playlistSpacerLeft} />
-				<div
-					style={{
-						...styles.playlistStepColumnLeft,
-						color: playlistSteps >= 2 ? theme.accent : undefined,
-					}}>
-					<div>|</div>
-					<div style={styles.nowrap}>Goto Playlists</div>
-				</div>
-				<div style={styles.playlistSpacerRight} />
+	// 			<span
+	// 				style={{
+	// 					...styles.stepLabelRight,
+	// 					color: playlistSteps >= 4 ? theme.accent : undefined,
+	// 				}}>
+	// 				Done
+	// 			</span>
+	// 		</div>
+	// 		<div style={styles.playlistDividerRow}>
+	// 			<div style={styles.playlistSpacerLeft} />
+	// 			<div
+	// 				style={{
+	// 					...styles.playlistStepColumnLeft,
+	// 					color: playlistSteps >= 2 ? theme.accent : undefined,
+	// 				}}>
+	// 				<div>|</div>
+	// 				<div style={styles.nowrap}>Goto Playlists</div>
+	// 			</div>
+	// 			<div style={styles.playlistSpacerRight} />
 
-				<div
-					style={{
-						...styles.playlistStepColumnRight,
-						color: playlistSteps >= 3 ? theme.accent : undefined,
-					}}>
-					<div>|</div>
-					<div style={styles.nowrap}>Create Playlist</div>
-				</div>
-			</div>
-		</div>
-	);
+	// 			<div
+	// 				style={{
+	// 					...styles.playlistStepColumnRight,
+	// 					color: playlistSteps >= 3 ? theme.accent : undefined,
+	// 				}}>
+	// 				<div>|</div>
+	// 				<div style={styles.nowrap}>Create Playlist</div>
+	// 			</div>
+	// 		</div>
+	// 	</div>
+	// );
 	return (
 		<>
-			<div style={styles.card}>
-				<div style={styles.cardSidebar}>
-					<div style={styles.cardSidebarContent}>
-						<div>Global Steps</div>
-						<div style={styles.cardControls}>
-							<button
+			<div style={styles.card} className="backdrop-blur-lg">
+				<div style={styles.cardBody}>
+					<div className="my-6 text-accent/80 dancing-script-semibold text-4xl rounded ">symply CT</div>
+					{/* <div className="mt-2 text-accent/80  text-xs  ">Do not interact with the page or switch tabs when the process is running.</div> */}
+					<div className="flex my-6 items-center justify-center  gap-6">
+						<button className="text-muted/50 group bg-card p-2 flex items-center justify-center rounded-lg scale-100">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ban-icon lucide-ban">
+								<circle cx="12" cy="12" r="10" />
+								<path d="M4.929 4.929 19.07 19.071" />
+							</svg>
+							<label className="absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 duration-200 pointer-events-none">Clear</label>
+						</button>
+						<button className="bg-muted p-2 -mt-5 flex items-center justify-center rounded-lg scale-120">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-icon lucide-play">
+								<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+							</svg>
+							<label className="absolute bottom-0 dancing-script-medium text-xl -mb-1 translate-y-full text-accent duration-200 pointer-events-none">Start</label>
+						</button>
+						<button className="text-muted/50 bg-card p-2 group flex items-center justify-center rounded-lg scale-100">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-import-icon lucide-import">
+								<path d="M12 3v12" />
+								<path d="m8 11 4 4 4-4" />
+								<path d="M8 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4" />
+							</svg>
+							<label className="absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 duration-200 pointer-events-none">Import</label>
+						</button>
+					</div>
+					<div className="mt-4 w-full flex gap-2">
+						<label className="text-muted/50 font-semibold">Configure & Create a Playlist</label>
+					</div>
+					<div className="w-full pointer-events-none h-10 px-2">
+						<div className="flex -mb-4 mt-10 w-full">
+							<div className="w-2 ml-5.5 group absolute pointer-events-auto text-muted left-1/6 -translate-x-1/2 flex flex-col items-center justify-center ">
+								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
+								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Navigate to Library</label>
+							</div>
+							<div className="w-2 ml-3.5 group absolute pointer-events-auto text-muted left-2/6 -translate-x-1/2 flex flex-col items-center justify-center ">
+								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
+								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Filter: Playlist</label>
+							</div>
+							<div className="w-2 ml-1.5 group absolute pointer-events-auto text-muted left-3/6 -translate-x-1/2 flex flex-col items-center justify-center ">
+								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
+								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">New Playlist</label>
+							</div>
+							<div className="w-2 -ml-0.5 group absolute pointer-events-auto text-muted left-4/6 -translate-x-1/2 flex flex-col items-center justify-center ">
+								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
+								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Configure</label>
+							</div>
+							<div className="w-2 -ml-2.5 group absolute pointer-events-auto text-muted left-5/6 -translate-x-1/2 flex flex-col items-center justify-center ">
+								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
+								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Create</label>
+							</div>
+						</div>
+						<div style={styles.stepsRow} className="pointer-events-none">
+							<div
 								style={{
-									...styles.controlButton,
-									backgroundColor:
-										activeButton === "decrement"
-											? theme.muted30
-											: hoveredButton === "decrement"
-												? theme.muted20
-												: theme.muted10,
+									...styles.progressFill,
+									minWidth: `calc(${Math.min(globalSteps,6)} / 6 * 100%)`,
 								}}
-								onMouseEnter={() => setHoveredButton("decrement")}
-								onMouseLeave={() => {
-									setHoveredButton(null);
-									setActiveButton(null);
-								}}
-								onMouseDown={() => setActiveButton("decrement")}
-								onMouseUp={() => setActiveButton(null)}
-								onClick={() => {
-									setGlobalSteps((prev) => Math.max(prev - 1, 0));
-								}}>
-								-
-							</button>
-							<button
-								style={{
-									...styles.controlButton,
-									backgroundColor:
-										activeButton === "increment"
-											? theme.muted30
-											: hoveredButton === "increment"
-												? theme.muted20
-												: theme.muted10,
-								}}
-								onMouseEnter={() => setHoveredButton("increment")}
-								onMouseLeave={() => {
-									setHoveredButton(null);
-									setActiveButton(null);
-								}}
-								onMouseDown={() => setActiveButton("increment")}
-								onMouseUp={() => setActiveButton(null)}
-								onClick={() => {
-									setGlobalSteps((prev) => Math.min(prev + 1, 4));
-								}}>
-								+
-							</button>
+							/>
+							<div style={styles.progressTick} />
+							<div style={styles.progressRemaining} />{" "}
 						</div>
 					</div>
-				</div>
-				<div style={styles.cardBody}>
-					{glboalStepsDisplay}
-					{playlistStepsDisplay}
 				</div>
 			</div>
 		</>
@@ -1467,7 +1306,19 @@ function App() {
 }
 
 export default App;
-//Begin
-//Goto libraray/playlists
-//Create Playlist
-//Done
+//Configure Playlist
+//--Navigate to library
+//--Navigate to playlists
+//--Create new playlist
+//--Set playlist name
+//Add songs to playlist
+//--repeat for each song:
+//----Search for song
+//----Open songs tab
+//----Match song
+//----if match:
+//------Open context menu
+//------Click "Add to playlist"
+//------Select playlist
+//----else:
+//------Add song to "not found" list
