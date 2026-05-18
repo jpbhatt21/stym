@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { styles } from "./css";
+import { styleFromClass, styles } from "./css";
+import YT from "./YT";
+import Unknown from "./Unkown";
 
 const songs = [
 	{
@@ -930,7 +932,7 @@ const songs = [
 		duration: 210,
 		img: "https://i.scdn.co/image/ab67616d0000485118b8088fe0c3dbf78398b55a",
 	},
-];
+]?[]:[];
 const results = [];
 const processing = {
 	searched: false,
@@ -1015,83 +1017,37 @@ async function matchSong(track) {
 		list,
 	};
 }
-async function searchTrack(track) {
-	const input = document.querySelector('input[id="input"]');
 
-	// Ensure element is focused
-	input.focus();
-	input.value = track.name;
-	input.dispatchEvent(new Event("input", { bubbles: true }));
-	const options = { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true, cancelable: true };
-	// Dispatch all three events in sequence
-	input.dispatchEvent(new KeyboardEvent("keydown", options));
-	input.dispatchEvent(new KeyboardEvent("keypress", options));
-	input.dispatchEvent(new KeyboardEvent("keyup", options));
-	await waitTillLoading();
-	//alert("Song searched");
-	document.querySelector('a[title="Show song results"]').click();
-	await waitTillLoading();
-	//alert("Song results shown");
-	const res = await matchSong(track);
-	//alert(res.match ? "Song matched, adding to playlist" : "No match found, skipping song");
-	if (res.match) {
-		console.log("matched", track, res.match);
-		const ele = res.list[res.match.id];
-		const contextMenuEvent = new MouseEvent("contextmenu", {
-			bubbles: true,
-			cancelable: true,
-			view: window,
-			buttons: 2,
-		});
-		ele.dispatchEvent(contextMenuEvent);
-		await new Promise((r) => setTimeout(() => r(), 25));
-		await waitTillLoading("ytmusic-menu-popup-renderer");
-		//alert("Context menu opened");
-		Array.from(document.querySelectorAll("a > yt-formatted-string"))
-			.find((x) => x.innerText == "Save to playlist")
-			?.click();
-		await new Promise((r) => setTimeout(() => r(), 25));
-		await waitTillLoading("ytmusic-add-to-playlist-renderer");
-		//alert("Add to playlist menu opened");
-		document.querySelector("ytmusic-add-to-playlist-renderer")?.querySelector(`button[aria-label="${playlist_name} "]`)?.click();
-		// Array.from(document.querySelectorAll("yt-formatted-string"))
-		// 	.filter((x) => x.innerText == playlist_name)
-		// 	?.pop()
-		// 	?.click();
-	}
-}
-
-async function addSongsToPlaylist() {
-	for (let i = 0; i < songs.length; i++) {
-		try {
-			await searchTrack(songs[i]);
-		} catch (e) {
-			console.log("error at ", songs[i], e);
-		}
-		await new Promise((r) => setTimeout(() => r(), 100));
-	}
-}
 // addSongsToPlaylist();
+const steps = ["Navigating to Library", "Filter by Playlists", "New Playlist", "Configuring Playlist", "Creating Playlist"];
+const trackSteps = ["Search for Track", "Filter by Songs", "Match Track", "Open Context Menu", "Add to Playlist"];
 function App() {
 	const [globalSteps, setGlobalSteps] = useState(0);
-	const [playlistSteps, setPlaylistSteps] = useState(0);
-	const [hoveredButton, setHoveredButton] = useState(null);
-	const [activeButton, setActiveButton] = useState(null);
+	const [playlistName, setPlaylistName] = useState(Date.now().toString());
+	const [failedSteps, setFailedSteps] = useState({});
+	const [failedTracks, setFailedTracks] = useState(new Set([]));
+	const [tab, setTab] = useState("ytm");
+	const [page, setPage] = useState("unknown");
+	useEffect(() => {
+		setPage(window.location.host);
+		setTab(window.location.host.includes("spotify") ? "spotify" : window.location.host.includes("youtube") ? "ytm" : tab);
+	}, [page]);
+	const totalSteps = globalSteps;
 	async function createYTPlaylist(name) {
-		setPlaylistSteps(2);
 		if (!location.pathname.startsWith("/library")) {
 			Array.from(document.querySelectorAll("tp-yt-paper-item"))
 				.find((x) => x.innerText == "Library")
 				?.click();
 			await waitTillLoading();
 		}
+		setGlobalSteps(2);
 		if (location.pathname != "/library/playlists") {
 			Array.from(document.querySelectorAll("iron-selector > ytmusic-chip-cloud-chip-renderer"))
 				.find((x) => x.innerText == "Playlists")
 				?.click();
 			await waitTillLoading();
 		}
-		setPlaylistSteps(3);
+		setGlobalSteps(3);
 		let x = document.querySelector('a[title="New playlist"]');
 		x.click();
 		// let x = document.querySelector('label[for="input-2"]')
@@ -1101,204 +1057,423 @@ function App() {
 			x = Array.from(document.querySelectorAll("label")).find((el) => el.textContent.trim() === "Title")?.nextElementSibling.firstElementChild;
 			await new Promise((r) => setTimeout(() => r(), 10));
 		}
-
+		setGlobalSteps(4);
 		x.value = name;
 		x.dispatchEvent(new Event("input", { bubbles: true }));
 		x = document.querySelector('button[aria-label="Create"]');
 		x.click();
+		setGlobalSteps(5);
 		await waitTillLoading();
 		await waitTillLoading("ytmusic-editable-playlist-detail-header-renderer");
-		setPlaylistSteps(4);
+		setGlobalSteps(6);
 	}
-	// useEffect(() => {
-	// 	if (globalSteps === 1) {
-	// 		setTimeout(() => setGlobalSteps(2), 500);
-	// 		return;
-	// 	}
-	// 	if (globalSteps === 2) {
-	// 		setPlaylistSteps(1);
-	// 	}
-	// 	if (globalSteps === 3) {
-	// 	}
-	// }, [globalSteps]);
-	// useEffect(() => {
-	// 	if (playlistSteps === 1) {
-	// 		setTimeout(() => createYTPlaylist(playlist_name), 500);
-	// 		return;
-	// 	}
-	// 	if (playlistSteps === 4) {
-	// 		setTimeout(() => setGlobalSteps(3), 500);
-	// 		return;
-	// 	}
-	// }, [playlistSteps]);
+	async function searchTrack(track, temp, playlist_name) {
+		const input = document.querySelector('input[id="input"]');
+		// Ensure element is focused
+		input.focus();
+		input.value = track.name;
+		input.dispatchEvent(new Event("input", { bubbles: true }));
+		const options = { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true, cancelable: true };
+		// Dispatch all three events in sequence
+		input.dispatchEvent(new KeyboardEvent("keydown", options));
+		input.dispatchEvent(new KeyboardEvent("keypress", options));
+		input.dispatchEvent(new KeyboardEvent("keyup", options));
+		await waitTillLoading();
+		setGlobalSteps((prev) => {
+			temp.globalSteps = prev - (prev % 5) + 2;
+			return temp.globalSteps;
+		});
+		//alert("Song searched");
+		document.querySelector('a[title="Show song results"]').click();
+		await waitTillLoading();
+		setGlobalSteps((prev) => {
+			temp.globalSteps = prev - (prev % 5) + 3;
+			return temp.globalSteps;
+		});
+		//alert("Song results shown");
+		const res = await matchSong(track);
+		//alert(res.match ? "Song matched, adding to playlist" : "No match found, skipping song");
+		if (res.match) {
+			console.log("matched", track, res.match);
+			const ele = res.list[res.match.id];
+			setGlobalSteps((prev) => {
+				temp.globalSteps = prev - (prev % 5) + 4;
+				return temp.globalSteps;
+			});
+			const contextMenuEvent = new MouseEvent("contextmenu", {
+				bubbles: true,
+				cancelable: true,
+				view: window,
+				buttons: 2,
+			});
+			ele.dispatchEvent(contextMenuEvent);
+			await new Promise((r) => setTimeout(() => r(), 25));
+			await waitTillLoading("ytmusic-menu-popup-renderer");
+			//alert("Context menu opened");
+			Array.from(document.querySelectorAll("a > yt-formatted-string"))
+				.find((x) => x.innerText == "Save to playlist")
+				?.click();
+			await new Promise((r) => setTimeout(() => r(), 25));
+			await waitTillLoading("ytmusic-add-to-playlist-renderer");
+			//alert("Add to playlist menu opened");
+			document.querySelector("ytmusic-add-to-playlist-renderer")?.querySelector(`button[aria-label="${playlist_name} "]`)?.click();
+			setGlobalSteps((prev) => {
+				temp.globalSteps = prev - (prev % 5) + 5;
+				return temp.globalSteps;
+			});
+			// Array.from(document.querySelectorAll("yt-formatted-string"))
+			// 	.filter((x) => x.innerText == playlist_name)
+			// 	?.pop()
+			// 	?.click();
+		}
+	}
 
-	// const glboalStepsDisplay = (
-	// 	<div style={{ ...styles.stepsContainer, marginBottom: "2.5rem" }}>
-	// 		<div style={styles.stepsRow}>
-	// 			<div
-	// 				style={{
-	// 					...styles.progressFill,
-	// 					minWidth: `calc(${globalSteps > 3 ? 7 : globalSteps > 2 ? 5 : globalSteps > 1 ? 2 : 0} / 7 * 100%)`,
-	// 				}}
-	// 			/>
-	// 			<div style={styles.progressTick} />
-	// 			<div style={styles.progressRemaining} />{" "}
-	// 		</div>
-	// 		<div style={styles.stepsLabelsRow}>
-	// 			<span
-	// 				style={{
-	// 					...styles.stepLabelLeft,
-	// 					color: globalSteps >= 1 ? theme.accent : undefined,
-	// 				}}>
-	// 				Begin
-	// 			</span>
-
-	// 			<span
-	// 				style={{
-	// 					...styles.stepLabelRight,
-	// 					color: globalSteps >= 4 ? theme.accent : undefined,
-	// 				}}>
-	// 				Done
-	// 			</span>
-	// 		</div>
-	// 		<div style={styles.stepsDividerRow}>
-	// 			<div
-	// 				style={{
-	// 					...styles.stepColumn,
-	// 					color: globalSteps >= 2 ? theme.accent : undefined,
-	// 				}}>
-	// 				<div>|</div>
-	// 				Create Playlist
-	// 			</div>
-	// 			<div
-	// 				style={{
-	// 					...styles.stepColumn,
-	// 					color: globalSteps >= 3 ? theme.accent : undefined,
-	// 				}}>
-	// 				<div>|</div>
-	// 				Add Songs
-	// 			</div>
-	// 		</div>
-	// 	</div>
-	// );
-	// const playlistStepsDisplay = (
-	// 	<div style={styles.stepsContainer}>
-	// 		<div style={styles.stepsRow}>
-	// 			<div
-	// 				style={{
-	// 					...styles.progressFill,
-	// 					minWidth: `calc(${playlistSteps > 3 ? 7 : playlistSteps > 2 ? 5 : playlistSteps > 1 ? 2 : 0} / 7 * 100%)`,
-	// 				}}
-	// 			/>
-	// 			<div style={styles.progressTick} />
-	// 			<div style={styles.progressRemaining} />{" "}
-	// 		</div>
-	// 		<div style={styles.stepsLabelsRow}>
-	// 			<span
-	// 				style={{
-	// 					...styles.stepLabelLeft,
-	// 					color: playlistSteps >= 1 ? theme.accent : undefined,
-	// 				}}>
-	// 				Begin
-	// 			</span>
-
-	// 			<span
-	// 				style={{
-	// 					...styles.stepLabelRight,
-	// 					color: playlistSteps >= 4 ? theme.accent : undefined,
-	// 				}}>
-	// 				Done
-	// 			</span>
-	// 		</div>
-	// 		<div style={styles.playlistDividerRow}>
-	// 			<div style={styles.playlistSpacerLeft} />
-	// 			<div
-	// 				style={{
-	// 					...styles.playlistStepColumnLeft,
-	// 					color: playlistSteps >= 2 ? theme.accent : undefined,
-	// 				}}>
-	// 				<div>|</div>
-	// 				<div style={styles.nowrap}>Goto Playlists</div>
-	// 			</div>
-	// 			<div style={styles.playlistSpacerRight} />
-
-	// 			<div
-	// 				style={{
-	// 					...styles.playlistStepColumnRight,
-	// 					color: playlistSteps >= 3 ? theme.accent : undefined,
-	// 				}}>
-	// 				<div>|</div>
-	// 				<div style={styles.nowrap}>Create Playlist</div>
-	// 			</div>
-	// 		</div>
-	// 	</div>
-	// );
+	async function addSongsToPlaylist(playlistName) {
+		const temp = {
+			globalSteps: 5,
+			failedSteps: {},
+			failedTracks: new Set([]),
+		};
+		setFailedSteps({});
+		setFailedTracks(new Set([]));
+		const songHeight = (document.getElementById("symply-ct-song-1-steps")?.getBoundingClientRect().bottom || 0) - (document.getElementById("symply-ct-song-1")?.getBoundingClientRect().top || 0);
+		for (let i = 0; i < songs.length; i++) {
+			try {
+				setGlobalSteps((prev) => {
+					temp.globalSteps = 5 * (i + 1) + 1;
+					return temp.globalSteps;
+				});
+				await searchTrack(songs[i], temp, playlistName);
+			} catch (e) {
+				setFailedSteps((prev) => {
+					const count = temp.globalSteps - 5 * (i + 1);
+					return { ...prev, [i]: { count, error: e } };
+				});
+				setFailedTracks((prev) => new Set([...prev, i]));
+				console.log("error at ", songs[i], e);
+			}
+			await new Promise((r) => setTimeout(() => r(), 100));
+			let container = document.getElementById("symply-ct-scroll-container");
+			if (container) {
+				container.scrollTo({ top: (songHeight || 76) * i, behavior: "smooth" });
+			}
+			await new Promise((r) => setTimeout(() => r(), 500));
+		}
+		setGlobalSteps((prev) => {
+			temp.globalSteps = 5 * (songs.length + 1) + 5;
+			return temp.globalSteps;
+		});
+	}
+	useEffect(() => {
+		if (globalSteps == 1) {
+			const now = Date.now().toString();
+			setPlaylistName(now);
+			createYTPlaylist(now);
+			// let cur = 1
+			// setInterval(()=>{
+			//   setGlobalSteps(++cur);
+			// }, 1000);
+		}
+		if (globalSteps == 6) {
+			addSongsToPlaylist(playlistName);
+		}
+	}, [globalSteps]);
+	function useStyles(str, sp = true) {
+		let res = {};
+		let missing = [];
+		for (let key of str.split(" ")) {
+			const cur = styleFromClass(key);
+			if (cur) {
+				res = { ...res, ...cur };
+			} else {
+				missing.push(key);
+			}
+		}
+		console.log(missing);
+		if (sp) {
+			console.log(res);
+		}
+		return res;
+	}
 	return (
 		<>
-			<div style={styles.card} className="backdrop-blur-lg">
-				<div style={styles.cardBody}>
-					<div className="my-6 text-accent/80 dancing-script-semibold text-4xl rounded ">symply CT</div>
-					{/* <div className="mt-2 text-accent/80  text-xs  ">Do not interact with the page or switch tabs when the process is running.</div> */}
-					<div className="flex my-6 items-center justify-center  gap-6">
-						<button className="text-muted/50 group bg-card p-2 flex items-center justify-center rounded-lg scale-100">
+			<div style={styles.card}>
+				<div style={{...styles.cardSubBody, opacity: tab=="set" || (songs.length || globalSteps)? 1 : 0, transitionDuration: "500ms", transitionProperty: "all"}}>
+					<div
+						className="dancing-script-semibold"
+						style={{
+							fontSize: "36px",
+							lineHeight: "1.1112",
+						}}>
+						symply CT
+					</div>
+					<div
+						style={{
+							display: "flex",
+							marginTop: "calc(1 * 2 * 4px)",
+							marginBottom: "calc(-1 * 1 * 4px)",
+							alignItems: "center",
+							justifyContent: "center",
+							scale: "calc(80/100)",
+							gap: "calc(6 * 4px)",
+						}}>
+						<button sym="true" className="group" style={styles.topButtonSubtle}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ban-icon lucide-ban">
 								<circle cx="12" cy="12" r="10" />
 								<path d="M4.929 4.929 19.07 19.071" />
 							</svg>
-							<label className="absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 duration-200 pointer-events-none">Clear</label>
+							<label
+								className="group-hover:opacity-100 opacity-0"
+								style={{
+									position: "absolute",
+									left: "calc( -1 * 2 * 4px)",
+									top: "calc( 1 * 2 * 4px)",
+									transform: "translateX(-100%)",
+									transitionDuration: "200ms",
+									pointerEvents: "none",
+									height: "calc(0 * 4px)",
+								}}>
+								Clear
+							</label>
 						</button>
-						<button className="bg-muted p-2 -mt-5 flex items-center justify-center rounded-lg scale-120">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play-icon lucide-play">
-								<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
-							</svg>
-							<label className="absolute bottom-0 dancing-script-medium text-xl -mb-1 translate-y-full text-accent duration-200 pointer-events-none">Start</label>
+						<button
+							sym="true"  
+							onClick={() => {
+								setGlobalSteps((prev) => prev || 1);
+							}}
+							className="group"
+							style={{
+								backgroundColor: "#8b85a1",
+								padding: "calc(2 * 4px)",
+								marginTop: "calc(-1 * 5 * 4px)",
+								color: "#0c0b0f",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								borderRadius: "8px",
+								scale: "calc(120/100)",
+							}}>
+							<div className="flex w-[24px] gap-[8px] h-[24px] flex-col items-center">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									style={{
+										minWidth: "100%",
+										minHeight: "100%",
+										transitionDuration: "500ms",
+										transitionProperty: "all",
+										marginTop: globalSteps ? "-32px" : "0",
+										filter: globalSteps ? "blur(4px)" : "none",
+									}}
+									minWidth="24"
+									minHeight="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-play-icon lucide-play">
+									<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+								</svg>
+								<svg
+									style={{
+										minWidth: "100%",
+										minHeight: "100%",
+										transitionDuration: "500ms",
+										transitionProperty: "all",
+										filter: !globalSteps ? "blur(4px)" : "none",
+									}}
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-pause-icon lucide-pause">
+									<rect x="14" y="3" width="5" height="18" rx="1" />
+									<rect x="5" y="3" width="5" height="18" rx="1" />
+								</svg>
+							</div>
+							<label
+								className="group-hover:opacity-100 opacity-0 dancing-script-medium "
+								style={{
+									position: "absolute",
+									bottom: "calc( 1 * 0 * 4px)",
+									fontSize: "20px",
+									lineHeight: "1.4",
+									marginBottom: "calc(-1 * 3 * 4px)",
+									transform: "translateY(100%)",
+									color: "#cac1ec",
+									transitionDuration: "200ms",
+									pointerEvents: "none",
+								}}>
+								Start
+							</label>
 						</button>
-						<button className="text-muted/50 bg-card p-2 group flex items-center justify-center rounded-lg scale-100">
+						<button
+							className="group"
+              sym="true"
+							style={{
+								color: "rgba(139, 133, 161, 0.75)",
+								backgroundColor: "#211f24",
+								padding: "calc(2 * 4px)",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								borderRadius: "8px",
+								scale: "calc(100/100)",
+							}}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-import-icon lucide-import">
 								<path d="M12 3v12" />
 								<path d="m8 11 4 4 4-4" />
 								<path d="M8 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4" />
 							</svg>
-							<label className="absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 duration-200 pointer-events-none">Import</label>
+							<label
+								className="group-hover:opacity-100 opacity-0"
+								style={{
+									position: "absolute",
+									right: "calc( -1 * 2 * 4px)",
+									top: "calc( 1 * 2 * 4px)",
+									transform: "translateX(100%)",
+									transitionDuration: "200ms",
+									pointerEvents: "none",
+									height: "calc(0 * 4px)",
+								}}>
+								Import
+							</label>
 						</button>
 					</div>
-					<div className="mt-4 w-full flex gap-2">
-						<label className="text-muted/50 font-semibold">Configure & Create a Playlist</label>
+				</div>
+				<div style={styles.cardBody}>
+					<div
+						key="ytm"
+						style={{
+							minWidth: "100%",
+							height: "100%",
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							overflow: "hidden",
+							overflowY: "auto",
+							marginLeft: tab == "ytm" ? "0" : "-100%",
+							transitionDuration: "500ms",
+							transitionProperty: "all",
+						}}
+						id="symply-ct-scroll-container">
+						{page != "music.youtube.com" ? <YT {...{ globalSteps, setGlobalSteps, totalSteps, failedTracks, steps, trackSteps, songs }} /> : <Unknown routeTo="music.youtube.com" />}
 					</div>
-					<div className="w-full pointer-events-none h-10 px-2">
-						<div className="flex -mb-4 mt-10 w-full">
-							<div className="w-2 ml-5.5 group absolute pointer-events-auto text-muted left-1/6 -translate-x-1/2 flex flex-col items-center justify-center ">
-								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
-								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Navigate to Library</label>
-							</div>
-							<div className="w-2 ml-3.5 group absolute pointer-events-auto text-muted left-2/6 -translate-x-1/2 flex flex-col items-center justify-center ">
-								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
-								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Filter: Playlist</label>
-							</div>
-							<div className="w-2 ml-1.5 group absolute pointer-events-auto text-muted left-3/6 -translate-x-1/2 flex flex-col items-center justify-center ">
-								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
-								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">New Playlist</label>
-							</div>
-							<div className="w-2 -ml-0.5 group absolute pointer-events-auto text-muted left-4/6 -translate-x-1/2 flex flex-col items-center justify-center ">
-								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
-								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Configure</label>
-							</div>
-							<div className="w-2 -ml-2.5 group absolute pointer-events-auto text-muted left-5/6 -translate-x-1/2 flex flex-col items-center justify-center ">
-								<div className="w-2 h-2 rounded bg-accent/40 group-hover:bg-accent duration-200" />
-								<label className="min-w-fit mt-4 whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 duration-200">Create</label>
-							</div>
-						</div>
-						<div style={styles.stepsRow} className="pointer-events-none">
-							<div
-								style={{
-									...styles.progressFill,
-									minWidth: `calc(${Math.min(globalSteps,6)} / 6 * 100%)`,
-								}}
-							/>
-							<div style={styles.progressTick} />
-							<div style={styles.progressRemaining} />{" "}
-						</div>
+					<div
+						key="spty"
+						style={{
+							minWidth: "100%",
+							height: "100%",
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							overflow: "hidden",
+							overflowY: "auto",
+						}}
+						id="symply-ct-spty-scroll-container">
+						{page !== "music.youtube.com" ? <YT {...{ globalSteps, setGlobalSteps, totalSteps, failedTracks, steps, trackSteps, songs }} /> : <Unknown routeTo="music.youtube.com" />}
 					</div>
+				</div>
+				<div key="tabs" className="flex items-center justify-between gap-[8px]" style={{ width: "100%", minHeight: "64px", padding: "8px", borderTop: "1px solid", borderColor: "rgba(202, 193, 236, 0.4)" }}>
+					<button style={styles.controlButton} onClick={() => setGlobalSteps((prev) => Math.max(prev - 1, 0))}>
+						-
+					</button>
+					<button style={styles.controlButton} onClick={() => setGlobalSteps((prev) => Math.min(prev + 1, 9999))}>
+						+
+					</button>
+					<button
+						key="ytm"
+            sym="true"
+						onClick={() => setTab("ytm")}
+						className="w-1/3 text-white hover:bg-destructive hover:text-background h-full flex font-bold items-center justify-center gap-[8px] rounded-[10px]"
+						style={{
+							background: tab == "ytm" ? "var(--destructive)" : "",
+							transitionDuration: "500ms",
+							transitionProperty: "all",
+							color: tab == "ytm" ? "var(--background)" : "",
+							filter: tab == "ytm" ? "drop-shadow(0 0 8px var(--destructive)) brightness(100%)" : "drop-shadow(0 0 0px var(--destructive)) brightness(70%)",
+						}}>
+						<div
+							className="outline outline-[#ff0033] text-white p-[5px] rounded-full"
+							style={{
+								background: "#fd2b2b",
+								padding: "5px",
+							}}>
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-[16px] w-[16px]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-music2-icon lucide-music-2">
+								<circle cx="8" cy="18" r="4" />
+								<path d="M12 18V2l7 4" />
+							</svg>
+						</div>
+						YT Music
+					</button>
+					<button
+						key="spty"
+            sym="true"
+						onClick={() => setTab("spty")}
+						className="w-1/3 text-white hover:bg-success hover:text-background h-full flex font-bold items-center justify-center gap-[8px] rounded-[10px]"
+						style={{
+							background: tab == "spty" ? "var(--success)" : "",
+							transitionDuration: "500ms",
+							transitionProperty: "all",
+							color: tab == "spty" ? "var(--background)" : "",
+
+							filter: tab == "spty" ? "drop-shadow(0 0 8px var(--success)) brightness(100%)" : "drop-shadow(0 0 0px var(--success)) brightness(70%)",
+						}}>
+						<div
+							style={{
+								background: "#1ed660",
+								padding: "5px",
+							}}
+							className="bg-[#1ed660] outline outline-[#3be479] text-black p-[5px] rotate-95 rounded-full">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-[16px] w-[16px]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-audio-lines-icon lucide-audio-lines">
+								<path d="M2 10v3" />
+								<path d="M6 6v11" />
+								<path d="M10 3v18" />
+								<path d="M14 8v7" />
+								<path d="M18 5v13" />
+								<path d="M22 10v3" />
+							</svg>
+						</div>
+						Spotify
+					</button>
+					<button
+						key="set"
+            sym="true"
+						onClick={() => setTab("set")}
+						className="w-1/3 text-white hover:bg-muted hover:text-background h-full flex font-bold items-center justify-center gap-[8px] rounded-[10px]"
+						style={{
+							background: tab == "set" ? "var(--accent)" : "",
+							transitionDuration: "500ms",
+							transitionProperty: "all",
+							color: tab == "set" ? "var(--background)" : "",
+							filter: tab == "set" ? "drop-shadow(0 0 8px var(--accent)) brightness(100%)" : "drop-shadow(0 0 0px var(--accent)) brightness(70%)",
+						}}>
+						<div
+							style={{
+								background: "var(--card)",
+								padding: "5px",
+							}}
+							className="bg-card outline outline-muted text-accent p-[5px] rounded-[10px]">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-[16px] w-[16px]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal-icon lucide-sliders-horizontal">
+								<path d="M10 5H3" />
+								<path d="M12 19H3" />
+								<path d="M14 3v4" />
+								<path d="M16 17v4" />
+								<path d="M21 12h-9" />
+								<path d="M21 19h-5" />
+								<path d="M21 5h-7" />
+								<path d="M8 10v4" />
+								<path d="M8 12H3" />
+							</svg>
+						</div>
+						Settings
+					</button>
 				</div>
 			</div>
 		</>
@@ -1306,19 +1481,3 @@ function App() {
 }
 
 export default App;
-//Configure Playlist
-//--Navigate to library
-//--Navigate to playlists
-//--Create new playlist
-//--Set playlist name
-//Add songs to playlist
-//--repeat for each song:
-//----Search for song
-//----Open songs tab
-//----Match song
-//----if match:
-//------Open context menu
-//------Click "Add to playlist"
-//------Select playlist
-//----else:
-//------Add song to "not found" list
