@@ -1,4 +1,33 @@
-function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlaylistPage }) {
+import { useEffect, useState } from "react";
+
+function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlaylistPage, tab }) {
+	const [repeats, setRepeats] = useState(0);
+	const [visible, setVisible] = useState(true);
+	useEffect(() => {
+		let timeout = null;
+		if (tab !== "spty") {
+			timeout = setTimeout(() => {
+				setVisible(false);
+			}, 500);
+		} else {
+			setVisible(true);
+		}
+		return () => {
+			if (timeout) clearTimeout(timeout);
+		};
+	}, [tab]);
+	useEffect(() => {
+		const rec = {};
+		let counter = 0;
+		songs.forEach((s) => {
+			const key = s.name + s.artist + s.duration + s.img + s.album;
+			if (rec[key]) {
+				counter++;
+			}
+			rec[key] = true;
+		});
+		setRepeats(counter);
+	}, [songs]);
 	return (
 		<>
 			<div
@@ -6,7 +35,7 @@ function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlayli
 				style={{
 					gap: "10px",
 					marginBottom: "-100%",
-					opacity: globalSteps ? "0" : "1",
+					opacity: globalSteps || songs.length ? "0" : "1",
 					transitionProperty: "all",
 					transitionDuration: "500ms",
 				}}>
@@ -28,7 +57,7 @@ function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlayli
 					Convert your Spotify playlist to YouTube Music
 				</label>
 				<button
-                disabled={!isSpotifyPlaylistPage}
+					disabled={!isSpotifyPlaylistPage}
 					sym="true"
 					onClick={() => {
 						setGlobalSteps((prev) => prev || 1);
@@ -53,7 +82,7 @@ function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlayli
 								minHeight: "100%",
 								transitionDuration: "500ms",
 								transitionProperty: "all",
-								marginTop: isSpotifyPlaylistPage? globalSteps ? "-64px" : "-32px" : "0px",
+								marginTop: isSpotifyPlaylistPage ? (globalSteps ? "-64px" : "-32px") : "0px",
 								filter: isSpotifyPlaylistPage ? "blur(4px)" : "none",
 							}}
 							viewBox="0 0 24 24"
@@ -117,21 +146,21 @@ function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlayli
 						color: "#cac1ec",
 						transitionDuration: "200ms",
 						pointerEvents: "none",
-                        transitionProperty: "all",
-                        opacity: isSpotifyPlaylistPage ? "1" : "0",
+						transitionProperty: "all",
+						opacity: isSpotifyPlaylistPage ? "1" : "0",
 					}}>
 					Start
 				</label>
-                <label
+				<label
 					style={{
 						fontSize: "18px",
 						lineHeight: "1.4",
 						color: "#cac1ec",
 						transitionDuration: "200ms",
 						pointerEvents: "none",
-                        transitionProperty: "all",
-                        marginTop: "-42px",
-                        opacity: isSpotifyPlaylistPage ? "0" : "1",
+						transitionProperty: "all",
+						marginTop: "-42px",
+						opacity: isSpotifyPlaylistPage ? "0" : "1",
 					}}>
 					Open a Spotify playlist to get started
 				</label>
@@ -173,108 +202,118 @@ function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlayli
 				<div className="flex w-full justify-evenly"></div>
 			</div>
 
-			<div
-				style={{
-					width: "100%",
-					paddingInline: "16px",
-					marginTop: "-24px",
-					paddingTop: "8px",
-					paddingBottom: "16px",
-					opacity: globalSteps > 0 ? "1" : "0",
-					transitionProperty: "all",
-					transitionDuration: "500ms",
-				}}>
+			{visible ? (
 				<div
 					style={{
-						color: globalSteps > 0 ? "var(--accent)" : "rgba(139, 133, 161, 0)",
-						width: "calc(full * 4px)",
-						display: "flex",
-						gap: "calc(2 * 4px)",
+						width: "100%",
+						paddingInline: "16px",
+						marginTop: "-24px",
+						paddingTop: "8px",
+						paddingBottom: "16px",
+						opacity: globalSteps || songs.length ? "1" : "0",
 						transitionProperty: "all",
-						transitionDuration: "200ms",
-						alignItems: "center",
+						transitionDuration: "500ms",
 					}}>
-					<svg
-						style={{
-							rotate: globalSteps > 0 ? "0deg" : "180deg",
-							marginLeft: globalSteps > 0 ? "7px" : "-36px",
-							zIndex: "10",
-							transitionDuration: "600ms",
-							transitionProperty: "all",
-						}}
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-badge-check-icon lucide-badge-check">
-						<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-						<path d="m9 12 2 2 4-4" />
-					</svg>
 					<div
 						style={{
-							backgroundColor: "#8b85a1",
-							color: "#0c0b0f",
-							width: "calc(10 * 4px)",
-							height: "calc(10 * 4px)",
-							transitionDuration: "600ms",
-							borderRadius: "4px",
-							zIndex: "0",
+							color: globalSteps || songs.length ? "var(--accent)" : "rgba(139, 133, 161, 0)",
+							width: "calc(full * 4px)",
 							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							marginLeft: globalSteps > 0 ? "-40px" : "",
-							filter: globalSteps > 0 ? "drop-shadow(0 0 12px var(--accent)) blur(2px)" : "",
-						}}>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cog-icon lucide-cog">
-							<path d="M11 10.27 7 3.34" />
-							<path d="m11 13.73-4 6.93" />
-							<path d="M12 22v-2" />
-							<path d="M12 2v2" />
-							<path d="M14 12h8" />
-							<path d="m17 20.66-1-1.73" />
-							<path d="m17 3.34-1 1.73" />
-							<path d="M2 12h2" />
-							<path d="m20.66 17-1.73-1" />
-							<path d="m20.66 7-1.73 1" />
-							<path d="m3.34 17 1.73-1" />
-							<path d="m3.34 7 1.73 1" />
-							<circle cx="12" cy="12" r="2" />
-							<circle cx="12" cy="12" r="8" />
-						</svg>
-					</div>
-					<label
-						style={{
+							gap: "calc(2 * 4px)",
 							transitionProperty: "all",
-							fontWeight: 600,
-							fontSize: "16px",
 							transitionDuration: "200ms",
-							color: globalSteps > 0 ? "var(--accent)" : "#8b85a1",
+							alignItems: "center",
 						}}>
-						Open a Spotify playlist
-					</label>
-				</div>
-				{songs.map((song, i) => (
-					<>
-						<div
-							key={i + "-1"}
-                            className="symply-fadein"
-							id={"symply-ct-song-" + i}
+						<svg
 							style={{
-								marginTop: "calc(1 * 8 * 4px)",
-								width: "calc(100%)",
-								display: "flex",
-								gap: "calc(2 * 4px)",
+								rotate: globalSteps || songs.length ? "0deg" : "180deg",
+								marginLeft: globalSteps || songs.length ? "7px" : "-36px",
+								zIndex: "10",
+								transitionDuration: "600ms",
 								transitionProperty: "all",
-								transitionDuration: "200ms",
+							}}
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-badge-check-icon lucide-badge-check">
+							<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+							<path d="m9 12 2 2 4-4" />
+						</svg>
+						<div
+							style={{
+								backgroundColor: "#8b85a1",
+								color: "#0c0b0f",
+								width: "calc(10 * 4px)",
+								height: "calc(10 * 4px)",
+								transitionDuration: "600ms",
+								borderRadius: "4px",
+								zIndex: "0",
+								display: "flex",
 								alignItems: "center",
-								// color: globalSteps > 5 * (i + 2) ? (failedTracks.has(i) ? "var(--destructive)" : "var(--accent)") : "rgba(139, 133, 161, 0)",
+								justifyContent: "center",
+								marginLeft: globalSteps || songs.length ? "-40px" : "",
+								filter: globalSteps || songs.length ? "drop-shadow(0 0 12px var(--accent)) blur(2px)" : "",
 							}}>
-							{/* <svg
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cog-icon lucide-cog">
+								<path d="M11 10.27 7 3.34" />
+								<path d="m11 13.73-4 6.93" />
+								<path d="M12 22v-2" />
+								<path d="M12 2v2" />
+								<path d="M14 12h8" />
+								<path d="m17 20.66-1-1.73" />
+								<path d="m17 3.34-1 1.73" />
+								<path d="M2 12h2" />
+								<path d="m20.66 17-1.73-1" />
+								<path d="m20.66 7-1.73 1" />
+								<path d="m3.34 17 1.73-1" />
+								<path d="m3.34 7 1.73 1" />
+								<circle cx="12" cy="12" r="2" />
+								<circle cx="12" cy="12" r="8" />
+							</svg>
+						</div>
+						<label
+							style={{
+								transitionProperty: "all",
+								fontWeight: 600,
+								fontSize: "16px",
+								transitionDuration: "200ms",
+								color: globalSteps || songs.length ? "var(--accent)" : "#8b85a1",
+							}}>
+							{globalSteps ? "Open a Spotify playlist" : `${songs.length} ${songs.length === 1 ? "song" : "songs"} added`}
+						</label>
+						<label
+							style={{
+								transitionProperty: "all",
+								fontSize: "12px",
+								transitionDuration: "200ms",
+								color: globalSteps || songs.length ? "var(--muted)" : "#8b85a1",
+							}}>
+							{globalSteps ? "" : `(${repeats} duplicate${repeats === 1 ? "" : "s"})`}
+						</label>
+					</div>
+					{songs.map((song, i) => (
+						<>
+							<div
+								key={i + "-1"}
+								className="symply-fadein"
+								id={"symply-ct-song-" + i}
+								style={{
+									marginTop: "calc(1 * 8 * 4px)",
+									width: "calc(100%)",
+									display: "flex",
+									gap: "calc(2 * 4px)",
+									transitionProperty: "all",
+									transitionDuration: "200ms",
+									alignItems: "center",
+									// color: globalSteps > 5 * (i + 2) ? (failedTracks.has(i) ? "var(--destructive)" : "var(--accent)") : "rgba(139, 133, 161, 0)",
+								}}>
+								{/* <svg
 								style={{
 									rotate: globalSteps > 5 * (i + 2) ? "0deg" : "180deg",
 									marginLeft: globalSteps > 5 * (i + 2) ? "0" : "-36px",
@@ -305,25 +344,28 @@ function Spotify({ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlayli
 									</>
 								)}
 							</svg> */}
-							<img src={song.img} style={{ borderRadius: "4px", width: "40px", height: "40px", objectFit: "cover", transitionDuration: "600ms", transitionProperty: "all", filter: `drop-shadow(0 0 16px var(--muted))` }} />
-							<div
-								style={{
-									display: "flex",
-									justifyContent: "space-between",
-									width: "100%",
-									alignItems: "center",
-									paddingRight: "calc(2 * 4px)",
-								}}>
-								<div style={{ display: "flex", flexDirection: "column" }}>
-									<span style={{ fontWeight: "600", fontSize: "16px", color: "#cac1ec" }}>{song.name}</span>
-									<span style={{ fontSize: "12px", color: "#8b85a1" }}>{song.artist}</span>
+								<img src={song.img} style={{ borderRadius: "4px", width: "40px", height: "40px", objectFit: "cover", transitionDuration: "600ms", transitionProperty: "all", filter: `drop-shadow(0 0 16px var(--muted))` }} />
+								<div
+									style={{
+										display: "flex",
+										justifyContent: "space-between",
+										width: "100%",
+										alignItems: "center",
+										paddingRight: "calc(2 * 4px)",
+									}}>
+									<div style={{ display: "flex", flexDirection: "column" }}>
+										<span style={{ fontWeight: "600", fontSize: "16px", color: "#cac1ec" }}>{song.name}</span>
+										<span style={{ fontSize: "12px", color: "#8b85a1" }}>{song.artist}</span>
+									</div>
+									<span style={{ fontSize: "14px", color: "#8b85a1" }}>{song.duration > 60 ? `${Math.floor(song.duration / 60)}:${song.duration % 60 < 10 ? "0" : ""}${song.duration % 60}` : `${song.duration}`}</span>
 								</div>
-								<span style={{ fontSize: "14px", color: "#8b85a1" }}>{song.duration > 60 ? `${Math.floor(song.duration / 60)}:${song.duration % 60 < 10 ? "0" : ""}${song.duration % 60}` : `${song.duration}`}</span>
 							</div>
-						</div>
-					</>
-				))}
-			</div>
+						</>
+					))}
+				</div>
+			) : (
+				<div></div>
+			)}
 		</>
 	);
 }

@@ -27,7 +27,7 @@ export const styles = {
 		gap: "4px",
 		width: "100%",
 		height: "100%",
-        pointerEvents: "none",
+		pointerEvents: "none",
 	},
 	progressFill: {
 		backgroundColor: theme.accent,
@@ -131,10 +131,12 @@ export const styles = {
 		background: `linear-gradient(180deg, ${theme.card}ee 0%, ${theme.background}dd 20%, #000000cc 100%)`,
 		display: "flex",
 		flexDirection: "column",
+		alignItems: "center",
 		WebkitBackdropFilter: "blur(10px)",
 		backdropFilter: "blur(10px)",
-        pointerEvents: "auto",
-        fontSize: "14px",
+		pointerEvents: "auto",
+		fontSize: "14px",
+		color: theme.background,
 	},
 	controlButton: {
 		borderRadius: "9999px",
@@ -150,17 +152,17 @@ export const styles = {
 		color: "inherit",
 		cursor: "pointer",
 	},
-    topButtonSubtle: {
-        color: theme.muted,
-        background: theme.card,
-        border: `0px solid ${theme.border}`,
-        padding: "8px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: "8px",
-        cursor: "pointer",
-    },
+	topButtonSubtle: {
+		color: theme.muted,
+		background: theme.card,
+		border: `0px solid ${theme.border}`,
+		padding: "8px",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		borderRadius: "8px",
+		cursor: "pointer",
+	},
 	cardBody: {
 		width: "100%",
 		height: "100%",
@@ -172,7 +174,7 @@ export const styles = {
 	cardSubBody: {
 		color: "color-mix(in oklab, " + theme.accent + " 80%, transparent)",
 		position: "sticky",
-        top: 0,
+		top: 0,
 		display: "flex",
 		alignItems: "center",
 		// backgroundColor: "color-mix(in oklab, " + theme.background + " 90%, transparent)",
@@ -203,6 +205,7 @@ export const styles = {
 	},
 	// "scale-80":{
 };
+
 export function styleFromClass(str) {
 	if (str == "flex")
 		return {
@@ -383,8 +386,8 @@ export function styleFromClass(str) {
 	}
 	return null;
 }
-export const spotifyURL = "https://open.spotify.com"
-export const spotifyHost = spotifyURL.split("//")[1]
+export const spotifyURL = "https://open.spotify.com";
+export const spotifyHost = spotifyURL.split("//")[1];
 
-export const ytURL = "https://music.youtube.com"
-export const ytHost = ytURL.split("//")[1]
+export const ytURL = "https://music.youtube.com";
+export const ytHost = ytURL.split("//")[1];

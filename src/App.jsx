@@ -1031,32 +1031,39 @@ function App() {
 	const [page, setPage] = useState("unknown");
 	const [songs, setSongs] = useState([]);
 	const [isSpotifyPlaylistPage, setIsSpotifyPlaylistPage] = useState(false);
-	console.log("songs", songs.length);
 	async function getPlaylist() {
 		document.querySelectorAll("div[data-overlayscrollbars-viewport]")[1].scrollTop = 0;
 		const res = [];
 		const container = document.getElementById("symply-ct-spty-scroll-container");
 		setSongs([]);
 		let added = true;
+		let dist = 56;
 		while (added) {
 			added = false;
 			let y = Array.from(document.querySelectorAll('div[data-testid="tracklist-row-placeholder"]')).filter((y) => y.children.length == 7 && y.getBoundingClientRect().top < window.innerHeight && y.getBoundingClientRect().bottom > 0);
 			console.log("placeholders", y.length);
-			while (y.length > 1) {
+			while (y.length > 2) {
 				await new Promise((r) => setTimeout(() => r(), 10));
 				y = Array.from(document.querySelectorAll('div[data-testid="tracklist-row-placeholder"]')).filter((y) => y.children.length == 7 && y.getBoundingClientRect().top < window.innerHeight && y.getBoundingClientRect().bottom > 0);
 			}
 			let x = Array.from(document.querySelectorAll('div[data-testid="tracklist-row"]')).filter((y) => y.children.length == 5);
 			if (res.length == 0) {
 				while (x.length == 0 || x[0].firstElementChild?.innerText != "1") {
+					console.log("loop");
 					await new Promise((r) => setTimeout(() => r(), 10));
 					document.querySelectorAll("div[data-overlayscrollbars-viewport]")[1].scrollTop = 0;
 					x = Array.from(document.querySelectorAll('div[data-testid="tracklist-row"]')).filter((y) => y.children.length == 5);
 				}
 			}
+			if (x.length > 1) {
+				dist = Math.abs(x[1].getBoundingClientRect().top - x[0].getBoundingClientRect().top);
+				if (dist < 10 || dist > 120) {
+					dist = 56;
+				}
+			}
 			for (let i = 0; i < x.length; i++) {
 				const e = x[i];
-				if (e.firstElementChild?.innerText <= res.length) {
+				if (e.firstElementChild?.innerText != res.length + 1) {
 					continue;
 				}
 				const track = {
@@ -1088,8 +1095,7 @@ function App() {
 				}, 200);
 				added = true;
 			}
-
-			document.querySelectorAll("div[data-overlayscrollbars-viewport]")[1].scrollTop += window.innerHeight / 2;
+			document.querySelectorAll("div[data-overlayscrollbars-viewport]")[1].scrollTop = dist * res.length;
 			await new Promise((r) => setTimeout(() => r(), 100));
 		}
 		function safeBtoa(str) {
@@ -1099,27 +1105,57 @@ function App() {
 		}
 		console.log(safeBtoa(JSON.stringify(res)));
 		console.log(res);
+		setGlobalSteps(0);
+		setTimeout(() => {
+			container.scrollTo({ top: 0, behavior: "smooth" });
+		}, 200);
+		document.getElementById("export-button")?.classList.add("sdwflash");
 		return res;
 	}
-
 	useEffect(() => {
-		setPage(window.location.host);
-		setTab(window.location.host.includes("spotify") ? "spty" : window.location.host.includes("youtube") ? "ytm" : tab);
+		let y = null;
 		if (window.location.host.includes("spotify")) {
 			if (location.pathname.includes("playlist")) {
 				setIsSpotifyPlaylistPage(true);
 			}
-			navigation.addEventListener("navigate", () => {
-				setPage(window.location.host);
-				if (window.location.pathname.includes("playlist")) {
+			y = (e) => {
+				const url = new URL(e.destination.url);
+				setPage(url.host);
+				if (url.pathname.includes("playlist")) {
 					setIsSpotifyPlaylistPage(true);
 				} else {
 					setIsSpotifyPlaylistPage(false);
 				}
-			});
+			};
+			navigation.addEventListener("navigate", y);
 		}
+		return () => {
+			if (y) {
+				navigation.removeEventListener("navigate", y);
+				y = null;
+			}
+		};
+	}, []);
+	useEffect(() => {
+		setPage(window.location.host);
+		setTab(window.location.host.includes("spotify") ? "spty" : window.location.host.includes("youtube") ? "ytm" : tab);
 	}, [page]);
 	const totalSteps = globalSteps;
+	function importConfig() {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "application/json";
+		input.onchange = (e) => {
+			const file = e.target.files[0];
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const data = JSON.parse(e.target.result);
+				if (data.songs) setSongs(data.songs);
+			};
+			reader.readAsText(file);
+		};
+		input.click();
+	}
 	async function createYTPlaylist(name) {
 		if (!location.pathname.startsWith("/library")) {
 			Array.from(document.querySelectorAll("tp-yt-paper-item"))
@@ -1316,7 +1352,17 @@ function App() {
 							scale: "calc(80/100)",
 							gap: "calc(6 * 4px)",
 						}}>
-						<button sym="true" className="group" style={styles.topButtonSubtle}>
+						<button
+							sym="true"
+							className="group"
+							style={styles.topButtonSubtle}
+							disabled={!!globalSteps}
+							onClick={() => {
+								setSongs([]);
+								setFailedSteps({});
+								setFailedTracks(new Set([]));
+								setGlobalSteps(0);
+							}}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ban-icon lucide-ban">
 								<circle cx="12" cy="12" r="10" />
 								<path d="M4.929 4.929 19.07 19.071" />
@@ -1414,7 +1460,28 @@ function App() {
 						</button>
 						<button
 							className="group"
+							id="export-button"
 							sym="true"
+							disabled={!!globalSteps}
+							onClick={(e) => {
+								e.currentTarget.classList.remove("sdwflash");
+								if (page == spotifyHost && songs.length) {
+									const json = {
+										songs,
+										timestamp: Date.now(),
+										ver: 1,
+									};
+									const blob = new Blob([JSON.stringify(json)], { type: "application/json" });
+									const url = URL.createObjectURL(blob);
+									const a = document.createElement("a");
+									a.href = url;
+									a.download = `symply-ct-${Date.now()}.json`;
+									a.click();
+									URL.revokeObjectURL(url);
+								} else if (page == ytHost) {
+									importConfig();
+								}
+							}}
 							style={{
 								color: "rgba(139, 133, 161, 0.75)",
 								backgroundColor: "#211f24",
@@ -1441,7 +1508,7 @@ function App() {
 									pointerEvents: "none",
 									height: "calc(0 * 4px)",
 								}}>
-								Import
+								{page == spotifyHost ? "Export" : "Import"}
 							</label>
 						</button>
 					</div>
@@ -1460,9 +1527,10 @@ function App() {
 							marginLeft: tab == "ytm" ? "0" : tab == "spty" ? "-100%" : "-200%",
 							transitionDuration: "500ms",
 							transitionProperty: "all",
+							paddingBottom: "64px",
 						}}
 						id="symply-ct-scroll-container">
-						{page == ytHost ? <YT {...{ globalSteps, setGlobalSteps, totalSteps, failedTracks, steps, trackSteps, songs }} /> : <Unknown routeTo={ytURL} />}
+						{page == ytHost ? <YT {...{ globalSteps, setGlobalSteps, totalSteps, failedTracks, steps, trackSteps, songs, importConfig ,tab }} /> : <Unknown routeTo={ytURL} />}
 					</div>
 					<div
 						key="spty"
@@ -1474,18 +1542,33 @@ function App() {
 							alignItems: "center",
 							overflow: "hidden",
 							overflowY: "auto",
+							paddingBottom: "64px",
 						}}
 						id="symply-ct-spty-scroll-container">
-						{page == spotifyHost ? <Spotify {...{ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlaylistPage: isSpotifyPlaylistPage }} /> : <Unknown routeTo={spotifyURL} />}
+						{page == spotifyHost ? <Spotify {...{ globalSteps, setGlobalSteps, songs, setSongs, isSpotifyPlaylistPage: isSpotifyPlaylistPage, tab }} /> : <Unknown routeTo={spotifyURL} />}
+					</div>
+					<div
+						key="set"
+						style={{
+							minWidth: "100%",
+							height: "100%",
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							overflow: "hidden",
+							overflowY: "auto",
+							paddingBottom: "64px",
+						}}>
+						{page == ytHost ? <YT {...{ globalSteps, setGlobalSteps, totalSteps, failedTracks, steps, trackSteps, songs, importConfig ,tab }} /> : <Unknown routeTo={ytURL} />}
 					</div>
 				</div>
-				<div key="tabs" className="flex items-center justify-between gap-[8px]" style={{ width: "100%", minHeight: "64px", padding: "8px", borderTop: "1px solid", borderColor: "rgba(202, 193, 236, 0.4)" }}>
-					<button style={styles.controlButton} onClick={() => setGlobalSteps((prev) => Math.max(prev - 1, 0))}>
+				<div key="tabs" className="flex items-center justify-between gap-[8px] bg-background/90 backdrop-blur-3xl backdrop-brightness-20" style={{ width: "96%", minHeight: "64px", marginTop: "-64px", padding: "8px", borderTopLeftRadius: "8px", borderTopRightRadius: "8px", borderColor: "rgba(202, 193, 236, 0.4)" }}>
+					{/* <button style={styles.controlButton} onClick={() => setGlobalSteps((prev) => Math.max(prev - 1, 0))}>
 						-
 					</button>
 					<button style={styles.controlButton} onClick={() => setGlobalSteps((prev) => Math.min(prev + 1, 9999))}>
 						+
-					</button>
+					</button> */}
 					<button
 						key="ytm"
 						sym="true"

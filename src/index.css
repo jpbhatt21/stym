@@ -1,5 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
 @import "tailwindcss";
+.sdwflash {
+	animation: sdwflash 1s ease-in-out infinite;
+}
+@keyframes sdwflash {
+	0%,
+	100% {
+		filter: drop-shadow(0 0 0px var(--accent));
+	}
+	50% {
+		filter: drop-shadow(0 0 8px var(--accent));
+	}
+}
 .dancing-script-regular {
 	font-family: "Dancing Script", cursive;
 	font-optical-sizing: auto;
@@ -13,17 +25,16 @@
 	font-style: normal;
 }
 button[sym="true"]:active {
-  transform: scale(0.95);
-
+	transform: scale(0.95);
 }
 button[sym="true"] {
-  transition: all 0.3s ease-in-out  !important;
+	transition: all 0.3s ease-in-out !important;
 }
 button[sym="true"]:hover {
-  transform: translateY(-2px)  !important;
-  filter: drop-shadow(0 0 8px var(--accent)) ;
+	transform: translateY(-2px) !important;
+	filter: drop-shadow(0 0 8px var(--accent));
 }
-.symply-fadein{
+.symply-fadein {
 	animation: fadeIn 0.5s ease-in-out forwards;
 }
 @keyframes fadeIn {
