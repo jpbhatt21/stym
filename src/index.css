@@ -23,7 +23,19 @@ button[sym="true"]:hover {
   transform: translateY(-2px)  !important;
   filter: drop-shadow(0 0 8px var(--accent)) ;
 }
-
+.symply-fadein{
+	animation: fadeIn 0.5s ease-in-out forwards;
+}
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
 .dancing-script-semibold {
 	font-family: "Dancing Script", cursive;
 	font-optical-sizing: auto;

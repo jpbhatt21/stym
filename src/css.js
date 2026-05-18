@@ -383,3 +383,8 @@ export function styleFromClass(str) {
 	}
 	return null;
 }
+export const spotifyURL = "https://open.spotify.com"
+export const spotifyHost = spotifyURL.split("//")[1]
+
+export const ytURL = "https://music.youtube.com"
+export const ytHost = ytURL.split("//")[1]
