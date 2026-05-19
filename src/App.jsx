@@ -1220,7 +1220,7 @@ function App() {
 		const res = await matchSong(track);
 		//alert(res.match ? "Song matched, adding to playlist" : "No match found, skipping song");
 		if (res.match) {
-			console.log("matched", track, res.match);
+			console.log("matched", track.name, res.match.name);
 			const ele = res.list[res.match.id];
 			setGlobalSteps((prev) => {
 				temp.globalSteps = prev - (prev % 5) + 4;
@@ -1251,6 +1251,9 @@ function App() {
 			// 	.filter((x) => x.innerText == playlist_name)
 			// 	?.pop()
 			// 	?.click();
+		}
+		else{
+			throw "No match found";
 		}
 	}
 	async function addSongsToPlaylist(playlistName) {
